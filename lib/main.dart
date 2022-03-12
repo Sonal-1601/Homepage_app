@@ -1,22 +1,33 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:homepage_app/Movies.dart';
-import 'Movies.dart';
-import 'Music.dart';
-import 'Shows.dart';
 
-void main() => runApp(MaterialApp(
-  debugShowCheckedModeBanner: false,
-   home: HomeScreen(),
-  ));
+void main() => runApp(const App());
+
+class App extends StatelessWidget {
+  const App({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        canvasColor: Colors.grey.shade900,
+        primaryColor: Colors.red,
+      ),
+      home: HomeScreen(),
+    );
+  }
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
-  fetchMovies()async{
-    var url;
-    url=  await http.get(Uri.parse("http://www.omdbapi.com/?i=tt3896198&apikey=18089b9e&s=Movies"));
-    return json.decode(url.body["results"]);
+  fetchMovies() async {
+    final response = await http.get(Uri.parse(
+        "http://www.omdbapi.com/?i=tt3896198&apikey=18089b9e&s=Movies"));
+    return json.decode(response.body)["results"];
   }
 
   @override
@@ -24,195 +35,197 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int currentIndex=0;
-  
+  int currentIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       backgroundColor: Colors.black87,
-      body:SafeArea(
-      child: Column(
-      children: <Widget>[
-        Row(
-          children:<Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal:28, vertical:21 ),
-              child: CircleAvatar(
-                radius:26.0,
-                backgroundImage: AssetImage('images/Amity.png'),
-
-              ),
-            ),
-
-            Text(
-              'Amity Blight',
-              textAlign: TextAlign.right,
-
-              style: TextStyle(
-                  color:Colors.white,
-                  fontSize: 18.0),
-            ),
-            SizedBox(
-                width:60.0
-            ),
-            InkWell(
-              child: Container(
-                child:ElevatedButton.icon(
-                  onPressed:(){
-
-                }, icon: Icon(Icons.search,
-                  color:Colors.grey,
-                ), label:Text('Search'),
-                  style:ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.grey.shade900),)
-
-              ),
-            ),
-            ),
+      backgroundColor: Colors.black87,
+      body: SafeArea(
+        child: Column(
+          children: <Widget>[
+            _TopAppBar(),
+            _TopTabBar(),
+            _Page(),
           ],
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
-          children: [
-            ElevatedButton(onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder:(context)=>Movies()));
-            }, child: Text('Movies'),
-            style:ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(Colors.red),
-            ),
-            ),
-
-
-            SizedBox(
-                width:10.0
-            ),
-
-            ElevatedButton(onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder:(context)=>Shows()));
-            }, child: Text('Shows'),
-                style:ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.red),),
-            ),
-
-            SizedBox(
-                width:13.0
-            ),
-
-            ElevatedButton(onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder:(context)=>Music()));
-
-            }, child: Text('Music'),
-               style:ButtonStyle(
-               backgroundColor: MaterialStateProperty.all(Colors.red),
-            ),
-            )
-
-          ],
-    ),
-
-           ListView(
-
-              children: [
-                Container(
-                  height: 200,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      Image.asset('images/Amity.png'),
-                      SizedBox(
-                        width:20,
-                      ),
-                      Image.asset('images/Amity.png'),
-                      SizedBox(
-                        width:20,
-                      ),
-                      Image.asset('images/Amity.png'),
-                      SizedBox(
-                        width:20,
-                      ),
-                      Image.asset('images/Amity.png'),
-                      SizedBox(
-                        width:20,
-                      ),
-                      Image.asset('images/Amity.png'),
-
-                    ],
-                  ),
-                ),
-
-
-              ],)
-
-
-
-
-
-
-
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentIndex,
+        onTap: (index) => setState(() => currentIndex = index),
+        backgroundColor: Colors.grey.shade900,
+        unselectedItemColor: Colors.grey,
+        selectedItemColor: Colors.redAccent,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        type: BottomNavigationBarType.fixed,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'homepage',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.star),
+            label: 'your fav',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark),
+            label: 'Your list',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.menu),
+            label: 'menubar',
+          ),
         ],
-        ),
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       ),
-      bottomNavigationBar: new Theme(
-        data: Theme.of(context).copyWith(
-            canvasColor: Colors.grey.shade900,
-            primaryColor: Colors.red,
-            textTheme: Theme
-                .of(context)
-                .textTheme
-                .copyWith(caption: new TextStyle(color: Colors.yellow))),
-        child: new BottomNavigationBar(
-          currentIndex: currentIndex,
-          onTap: (index)=> setState(() => currentIndex= index),
-          backgroundColor: Colors.black12,
-          unselectedItemColor: Colors.grey,
-          selectedItemColor: Colors.redAccent,
-          showSelectedLabels:false,
-          showUnselectedLabels: false,
-
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-                label:'homepage'
-            ),
-
-            BottomNavigationBarItem(
-              icon: Icon(Icons.star),
-                label:'your fav'
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark),
-              label: 'Your list'
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.menu),
-                label:'menubar',
-
-            ),
-
-          ],
-
-        ),
-      ),
-
     );
-
+  }
 }
+
+class _Page extends StatelessWidget {
+  const _Page({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: ListView(
+        children: [
+          SizedBox(
+            height: 150,
+            child: _ItemSection(),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
+class _ItemSection extends StatelessWidget {
+  const _ItemSection({
+    Key? key,
+  }) : super(key: key);
 
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: 10,
+      shrinkWrap: true,
+      itemBuilder: (context, index) {
+        return _Item();
+      },
+    );
+  }
+}
 
+class _Item extends StatelessWidget {
+  const _Item({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Hello world'),
+        ));
+      },
+      child: AspectRatio(
+        aspectRatio: 1 / 1.6,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Card(
+            color: Colors.yellow,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TopAppBar extends StatelessWidget {
+  const _TopAppBar({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 21),
+          child: CircleAvatar(
+            radius: 26.0,
+            backgroundImage: AssetImage('images/Amity.png'),
+          ),
+        ),
+        Text(
+          'Amity Blight',
+          textAlign: TextAlign.right,
+          style: TextStyle(color: Colors.white, fontSize: 18.0),
+        ),
+        Spacer(),
+        InkWell(
+          child: Container(
+            child: ElevatedButton.icon(
+              onPressed: () {},
+              icon: Icon(
+                Icons.search,
+                color: Colors.grey,
+              ),
+              label: Text('Search'),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.grey.shade900,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TopTabBar extends StatelessWidget {
+  const _TopTabBar({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedButtonStyle = ElevatedButton.styleFrom(
+      primary: Colors.red,
+    );
+    final unSelectedButtonStyle = ElevatedButton.styleFrom(
+      primary: Colors.grey,
+    );
+    return ButtonBar(
+      alignment: MainAxisAlignment.center,
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            //
+          },
+          child: Text('Movies'),
+          style: unSelectedButtonStyle,
+        ),
+        ElevatedButton(
+          onPressed: () {
+            //
+          },
+          child: Text('Shows'),
+          style: selectedButtonStyle,
+        ),
+        ElevatedButton(
+          onPressed: () {
+            //
+          },
+          child: Text('Music'),
+          style: unSelectedButtonStyle,
+        )
+      ],
+    );
+  }
+}
